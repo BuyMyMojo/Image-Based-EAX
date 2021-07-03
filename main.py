@@ -20,24 +20,12 @@ async def on_ready():
 @bot.command()
 async def foo(ctx, *, arg):
     await ctx.send(arg)
-    
-# simple addition, adds two numbers together
-@bot.command()
-async def add(ctx, a: int, b: int):
-    await ctx.send(a + b)
 
-# simple addition, adds two numbers together but done in a seperate function
-@bot.command()
-async def funcadd(ctx, a: int, b: int):
-    await ctx.send(adding(a, b))
-
-def adding(a: int, b: int):
-    return(a+b)
-
+# Generates an image displaying the difference between two images (RGB 8bit)
 @bot.command()
 async def ImgDif(ctx, img1: str, img2: str):
-    download_temp_image(img1, "dif_img_1")
-    download_temp_image(img2, "dif_img_2")
+    download_temp_file(img1, "dif_img_1")
+    download_temp_file(img2, "dif_img_2")
     
     get_img_dif("dif_img_1", "dif_img_2")
     
@@ -47,16 +35,19 @@ async def ImgDif(ctx, img1: str, img2: str):
     await ctx.send(file=discord.File('./temp/difference.png'))
     
     delete_temp_file("difference.png")
-        
-def download_temp_image(img, name):
-    response = requests.get(img)
+
+# Downloads file into ./temp/     
+def download_temp_file(file, name):
+    response = requests.get(file)
     file = open("./temp/" + name, "wb")
     file.write(response.content)
     file.close()
     
+# Deletes file from ./temp/
 def delete_temp_file(name):
     os.remove("./temp/"+ name)
 
+# Generates difference img
 def get_img_dif(name1, name2):
     imgA = pil_img.open("./temp/" + name1)
     imgB = pil_img.open("./temp/" + name2)
