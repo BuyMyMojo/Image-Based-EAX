@@ -1,4 +1,6 @@
 # Image Based EAX
+[![CodeFactor](https://www.codefactor.io/repository/github/buymymojo/image-based-eax/badge)](https://www.codefactor.io/repository/github/buymymojo/image-based-eax)
+
  A discord bot that has nothing to do with EAX
 
 
