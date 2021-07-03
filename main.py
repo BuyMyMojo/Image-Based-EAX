@@ -7,6 +7,8 @@ from PIL import ImageChops as pil_img_chops
 from PIL import ImageFilter as pil_img_filter
 import os
 import time
+import math
+import deeppyer as dp
 
 owner_id = "383507911160233985"
 
@@ -40,12 +42,32 @@ async def censor(ctx, img: str):
     
 
 @bot.command()
-async def gayCensor(ctx, img1: str):
-    return
+async def gaycensor(ctx, img: str):
+    uid = str(ctx.message.author.id)
+    download_temp_file(img, "gaycensor_base_" + uid)
+    
+    imgA = pil_img.open("./temp/" + "gaycensor_base_" + uid)
+    flag = pil_img.open("./censorship_flag.png")
+    
+    flag_x_res = math.trunc(int(int(imgA.size[0]) * 0.75))
+    flag_y_res = math.trunc(int(int(imgA.size[1]) * 0.75))
+    
+    flag = flag.resize((flag_x_res,flag_y_res), pil_img.ANTIALIAS)
+    
+    paste_x = math.trunc(int(int(imgA.size[0] - flag.size[0]) / 2))
+    paste_y = math.trunc(int(int(imgA.size[1] - flag.size[1]) / 2))
+    
+    imgA.paste(flag, (paste_x, paste_y), flag)
+    imgA.save("./temp/gaycensor_" + uid + ".png")
+    
+    await ctx.send(file=discord.File('./temp/gaycensor_' + uid + '.png'))
+    
+    delete_temp_file("gaycensor_base_" + uid)
+    delete_temp_file("gaycensor_" + uid + ".png")
 
 # Generates an image displaying the difference between two images (RGB 8bit)
 @bot.command()
-async def ImgDif(ctx, img1: str, img2: str):
+async def imgdif(ctx, img1: str, img2: str):
     uid = str(ctx.message.author.id)
     download_temp_file(img1, "dif_img_1_" + uid)
     download_temp_file(img2, "dif_img_2_" + uid)
@@ -81,6 +103,25 @@ def get_img_dif(name1, name2, ctx):
     difference = pil_img_chops.difference(imgA_convert, imgB_convert)
     difference.save("./temp/difference_" + str(ctx.message.author.id) + ".png")
     
+@bot.command()
+async def fry(ctx, img: str, colour="red"):
+    uid = str(ctx.message.author.id)
+    download_temp_file(img, "fry_base_" + uid)
+    
+    imgA = pil_img.open("./temp/" + "fry_base_" + uid)
+    if colour == "red":
+        imgB = await dp.deepfry(imgA, colours=dp.DefaultColours.red, flares=False)
+    elif colour == "blue":
+        imgB = await dp.deepfry(imgA, colours=dp.DefaultColours.blue, flares=False)
+    else:
+        imgB = await dp.deepfry(imgA, colours=dp.DefaultColours.red, flares=False)
+    imgB.save("./temp/fry_" + uid + ".png")
+    
+    await ctx.send(file=discord.File('./temp/fry_' + uid + '.png'))
+    
+    delete_temp_file("fry_base_" + uid)
+    delete_temp_file("fry_" + uid + ".png")
+
 @bot.command()
 async def uid(ctx):
     await ctx.send("Your ID is: " + str(ctx.message.author.id))
