@@ -14,7 +14,7 @@ from discord.ext import commands
 from config import bot_token, owner_id
 
 
-bot = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix=']')
 
 
 @bot.event
