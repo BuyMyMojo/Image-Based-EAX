@@ -5,8 +5,9 @@ import cv2 as cv
 from PIL import Image as pil_img
 from PIL import ImageChops as pil_img_chops
 import os
+import time
 
-
+owner_id = "383507911160233985"
 
 bot = commands.Bot(command_prefix='$')
 
@@ -58,8 +59,19 @@ def get_img_dif(name1, name2):
     difference = pil_img_chops.difference(imgA_convert, imgB_convert)
     difference.save("./temp/difference.png")
     
+@bot.command()
+async def uid(ctx):
+    await ctx.send("Your ID is: " + str(ctx.message.author.id))
     
     
+@bot.command()
+async def stop(ctx):
+    if str(ctx.message.author.id) == owner_id:
+        await bot.change_presence(status=discord.Status.offline)
+        time.sleep(5)
+        await bot.close()
+    else:
+        await ctx.send("You are now the bot owner")
     
     
         
