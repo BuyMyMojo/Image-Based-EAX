@@ -11,7 +11,8 @@ from PIL import ImageChops as pil_img_chops
 from PIL import ImageFilter as pil_img_filter
 from discord.ext import commands
 
-owner_id = "383507911160233985"
+from config import bot_token, owner_id
+
 
 bot = commands.Bot(command_prefix='$')
 
@@ -146,4 +147,4 @@ async def stop(ctx):
         await ctx.send("You are now the bot owner")
     
 
-bot.run('ODYwNzg5MDAwMDYxODQ1NTE0.YOAWOg.ThcPFf4dg1v7IJrOH7n2GrueNiw')
+bot.run(bot_token)
