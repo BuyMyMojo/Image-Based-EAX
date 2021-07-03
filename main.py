@@ -13,8 +13,16 @@ from discord.ext import commands
 
 from config import bot_token, owner_id
 
+# Change only the no_category default string
+help_command = commands.DefaultHelpCommand(
+    no_category='Commands'
+)
 
-bot = commands.Bot(command_prefix=']')
+bot = commands.Bot(
+    command_prefix=commands.when_mentioned_or(']'),
+    description="Image Based EAX",
+    help_command=help_command
+)
 
 
 @bot.event
@@ -24,12 +32,12 @@ async def on_ready():
     
     
 # This command sends back the arguments given as one message
-@bot.command()
+@bot.command(name="foo", description="This was made as a test", help="Sends back whatever text you give it")
 async def foo(ctx, *, arg):
     await ctx.send(arg)
 
 
-@bot.command()
+@bot.command(name="censor", descrpition="Blurs out whatever is in the image", help="Make supplied image blurry")
 async def censor(ctx, img: str):
     user_id = str(ctx.message.author.id)
     download_temp_file(img, "censor_base_" + user_id)
@@ -45,7 +53,7 @@ async def censor(ctx, img: str):
     delete_temp_file("censor_" + user_id + ".png")
     
 
-@bot.command()
+@bot.command(name="gaycensor", description="Hide it with pride", help="Covers an image in the pride flag")
 async def gaycensor(ctx, img: str):
     user_id = str(ctx.message.author.id)
     download_temp_file(img, "gaycensor_base_" + user_id)
@@ -71,7 +79,7 @@ async def gaycensor(ctx, img: str):
 
 
 # Generates an image displaying the difference between two images (RGB 8bit)
-@bot.command()
+@bot.command(name="imgdif", description="Generated a difference map between two images of the same size so you can see what exact changed", help="Give it two images of the same size to see the differences")
 async def imgdif(ctx, img1: str, img2: str):
     user_id = str(ctx.message.author.id)
     download_temp_file(img1, "dif_img_1_" + user_id)
@@ -112,15 +120,15 @@ def get_img_dif(name1, name2, ctx):
     difference.save("./temp/difference_" + str(ctx.message.author.id) + ".png")
 
 
-@bot.command()
-async def fry(ctx, img: str, colour="red"):
+@bot.command(name="fry", description="It fries the image, what more do you want?", help="Input the URL of an image and have it baked to perfection")
+async def fry(ctx, img: str, optional_colour_change="red"):
     user_id = str(ctx.message.author.id)
     download_temp_file(img, "fry_base_" + user_id)
     
     img_a = pil_img.open("./temp/" + "fry_base_" + user_id)
-    if colour == "red":
+    if optional_colour_change == "red":
         img_b = await dp.deepfry(img_a, colours=dp.DefaultColours.red, flares=False)
-    elif colour == "blue":
+    elif optional_colour_change == "blue":
         img_b = await dp.deepfry(img_a, colours=dp.DefaultColours.blue, flares=False)
     else:
         img_b = await dp.deepfry(img_a, colours=dp.DefaultColours.red, flares=False)
@@ -132,12 +140,17 @@ async def fry(ctx, img: str, colour="red"):
     delete_temp_file("fry_" + user_id + ".png")
 
 
-@bot.command()
-async def uid(ctx):
+@bot.command(name="myid", description="Get your own User ID", help="It returns your discord User ID")
+async def myid(ctx):
     await ctx.send("Your ID is: " + str(ctx.message.author.id))
-    
-    
-@bot.command()
+
+
+@bot.command(name="uid", descrition="Get the User ID of whoever you mention", help="Mention someone to get their ID")
+async def uid(ctx, user: discord.User):
+    await ctx.send(user.id)
+
+
+@bot.command(name="stop", description="Only the bot owner can stop the bot", help="Stops the bot when ran")
 async def stop(ctx):
     if str(ctx.message.author.id) == owner_id:
         await bot.change_presence(status=discord.Status.offline)
