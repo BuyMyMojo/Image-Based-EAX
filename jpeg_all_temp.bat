@@ -1,0 +1,2 @@
+cd ./temp/
+FOR /D /r %%G in ("User*") DO npx @squoosh/cli --mozjpeg '{"quality":80,"baseline":false,"arithmetic":false,"progressive":true,"optimize_coding":true,"smoothing":0,"color_space":3,"quant_table":3,"trellis_multipass":true,"trellis_opt_zero":true,"trellis_opt_table":true,"trellis_loops":1,"auto_subsample":true,"chroma_subsample":2,"separate_chroma_quality":true,"chroma_quality":75}' %%~nxG

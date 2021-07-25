@@ -1,7 +1,7 @@
 import math
 import os
 import time
-
+import subprocess
 import deeppyer as dp
 import discord
 import requests
@@ -46,12 +46,13 @@ async def censor(ctx, img: str):
     
     blurred_image = img_a.filter(pil_img_filter.BoxBlur(10))
     blurred_image.save("./temp/censor_" + user_id + ".png")
-    
+
+    optimise_png_from_temp("censor_" + user_id + ".png")
     await ctx.send(file=discord.File('./temp/censor_' + user_id + '.png'))
-    
+
     delete_temp_file("censor_base_" + user_id)
     delete_temp_file("censor_" + user_id + ".png")
-    
+
 
 @bot.command(name="gaycensor", description="Hide it with pride", help="Covers an image in the pride flag")
 async def gaycensor(ctx, img: str):
@@ -71,7 +72,8 @@ async def gaycensor(ctx, img: str):
     
     img_a.paste(flag, (paste_x, paste_y), flag)
     img_a.save("./temp/gaycensor_" + user_id + ".png")
-    
+
+    optimise_png_from_temp("gaycensor_" + user_id + ".png")
     await ctx.send(file=discord.File('./temp/gaycensor_' + user_id + '.png'))
     
     delete_temp_file("gaycensor_base_" + user_id)
@@ -85,13 +87,13 @@ async def imgdif(ctx, img1: str, img2: str):
     download_temp_file(img1, "dif_img_1_" + user_id)
     download_temp_file(img2, "dif_img_2_" + user_id)
     
-    get_img_dif("dif_img_1_" + user_id, "dif_img_2_" + user_id, ctx)
+    get_img_dif("dif_img_1_" + user_id, "dif_img_2_" + user_id, user_id)
     
     delete_temp_file("dif_img_1_" + user_id)
     delete_temp_file("dif_img_2_" + user_id)
-    
+
     await ctx.send(file=discord.File('./temp/difference_' + user_id + '.png'))
-    
+
     delete_temp_file("difference_" + user_id + ".png")
 
 
@@ -109,7 +111,7 @@ def delete_temp_file(name):
 
 
 # Generates difference img
-def get_img_dif(name1, name2, ctx):
+def get_img_dif(name1, name2, user_id):
     img_a = pil_img.open("./temp/" + name1)
     img_b = pil_img.open("./temp/" + name2)
     
@@ -117,7 +119,8 @@ def get_img_dif(name1, name2, ctx):
     img_b_convert = img_b.convert("RGB")
     
     difference = pil_img_chops.difference(img_a_convert, img_b_convert)
-    difference.save("./temp/difference_" + str(ctx.message.author.id) + ".png")
+    difference.save("./temp/difference_" + user_id + ".png")
+    optimise_png_from_temp("difference_" + user_id + ".png")
 
 
 @bot.command(name="fry", description="It fries the image, what more do you want?", help="Input the URL of an image and have it baked to perfection")
@@ -133,7 +136,8 @@ async def fry(ctx, img: str, optional_colour_change="red"):
     else:
         img_b = await dp.deepfry(img_a, colours=dp.DefaultColours.red, flares=False)
     img_b.save("./temp/fry_" + user_id + ".png")
-    
+
+    optimise_png_from_temp("fry_" + user_id + ".png")
     await ctx.send(file=discord.File('./temp/fry_' + user_id + '.png'))
     
     delete_temp_file("fry_base_" + user_id)
@@ -158,6 +162,11 @@ async def stop(ctx):
         await bot.close()
     else:
         await ctx.send("You are now the bot owner")
+
+
+def optimise_png_from_temp(name):
+    oxipng = subprocess.call(['oxipng', '-o', 'max', str('./temp/' + name)])
+    print("Output of call() : ", oxipng)
     
 
 bot.run(bot_token)
